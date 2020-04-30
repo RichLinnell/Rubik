@@ -3,8 +3,7 @@ import React from 'react'
 function Face(props)
 {
     return (
-            <div className='cube-face'>
-                <h2>{props.faceInfo.name}</h2>
+            <div className={'cube__face cube__face--' + props.faceInfo.name}>
                 <div className='cube-row'>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[0][0].colour}}/>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[0][1].colour}}/>
@@ -19,10 +18,6 @@ function Face(props)
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[2][0].colour}}/>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[2][1].colour}}/>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[2][2].colour}}/>
-                </div>
-                <div className='cube-buttons'>
-                    <button onClick={props.rotateLeft}>Rotate Anticlockwise</button>
-                    <button onClick={props.rotateRight}>Rotate Clockwise</button>
                 </div>
             </div>
     );
@@ -40,12 +35,12 @@ class Cube extends React.Component
     constructor(props){
         super(props);
         const faces = [
-            {name: 'Front', data: this.makeFace('red')}, //0
-            {name: 'Top', data: this.makeFace('yellow')}, //1
-            {name: 'Bottom', data: this.makeFace('white')}, //2
-            {name: 'Right', data: this.makeFace('green')}, //3
-            {name: 'Left', data: this.makeFace('blue')}, //4
-            {name: 'Back', data: this.makeFace('orange')} //5
+            {name: 'front', data: this.makeFace('red')}, //0
+            {name: 'top', data: this.makeFace('yellow')}, //1
+            {name: 'bottom', data: this.makeFace('lightgray')}, //2
+            {name: 'right', data: this.makeFace('green')}, //3
+            {name: 'left', data: this.makeFace('blue')}, //4
+            {name: 'back', data: this.makeFace('orange')} //5
         ];
 
         const row0 = [{row: 0, col: 2}, {row: 0, col: 1}, {row: 0, col: 0}];
@@ -98,7 +93,9 @@ class Cube extends React.Component
         this.fillFaceAssociations(faces[this.ORANGE], top, left, bottom, right);
 
         this.state = {
-            faces : faces 
+            faces : faces,
+            showClass : 'show-front',
+            currentFaceId: 0
         };
     }
 
@@ -129,12 +126,12 @@ class Cube extends React.Component
 
     cloneStateFaces(){
         const newFaces = [
-            {name: 'Front', data: this.makeFace('red')}, //0
-            {name: 'Top', data: this.makeFace('yellow')}, //1
-            {name: 'Bottom', data: this.makeFace('white')}, //2
-            {name: 'Right', data: this.makeFace('green')}, //3
-            {name: 'Left', data: this.makeFace('blue')}, //4
-            {name: 'Back', data: this.makeFace('orange')} //5
+            {name: 'front', data: this.makeFace('red')}, //0
+            {name: 'top', data: this.makeFace('yellow')}, //1
+            {name: 'bottom', data: this.makeFace('lightgray')}, //2
+            {name: 'right', data: this.makeFace('green')}, //3
+            {name: 'left', data: this.makeFace('blue')}, //4
+            {name: 'back', data: this.makeFace('orange')} //5
         ];
         this.state.faces.forEach((item, index)=>{
             item.data.forEach((row, rowIndex) => {
@@ -148,7 +145,8 @@ class Cube extends React.Component
         return newFaces;
     }
 
-    rotateRight(faceId){
+    rotateRight(){
+        const faceId = this.state.currentFaceId;
         const newFaces = this.cloneStateFaces();
         const existingFace = this.state.faces[faceId];
         const newFace = newFaces[faceId];
@@ -163,10 +161,11 @@ class Cube extends React.Component
         this.pushCell(newFaces, existingFace.data[2][0], newFace.data[0][0]);
         this.pushCell(newFaces, existingFace.data[2][1], newFace.data[1][0]);
         this.pushCell(newFaces, existingFace.data[2][2], newFace.data[2][0]);
-        this.setState({faces: newFaces});
+        this.setState({faces: newFaces, showClass: this.state.showClass});
     }
 
-    rotateLeft(faceId){
+    rotateLeft(){
+        const faceId = this.state.currentFaceId;
         const newFaces = this.cloneStateFaces();
         const existingFace = this.state.faces[faceId];
         const newFace = newFaces[faceId];
@@ -181,7 +180,7 @@ class Cube extends React.Component
         this.pushCell(newFaces, existingFace.data[2][0], newFace.data[2][2]);
         this.pushCell(newFaces, existingFace.data[2][1], newFace.data[1][2]);
         this.pushCell(newFaces, existingFace.data[2][2], newFace.data[0][2]);
-        this.setState({faces: newFaces});
+        this.setState({faces: newFaces, showClass: this.state.showClass, currentFaceId: this.state.currentFaceId});
     }
 
     pushCell(newFaces, source, target){
@@ -200,19 +199,43 @@ class Cube extends React.Component
         }
     }
 
+    selectView(faceId){
+        const side = this.state.faces[faceId].name;
+        const showClass = 'show-' + side;
+        this.setState({...this.state, showClass: showClass, currentFaceId: faceId})
+    }
+  
     render(){
         return (
-            <div className='cube'>
-                { this.state.faces.map((face, id) => 
-                    {
-                        return (
-                            <div key={id}>
-                                <Face faceInfo={face} rotateRight={() => this.rotateRight(id) } rotateLeft={() => this.rotateLeft(id) }/>
-                            </div>
-                        )
-                    }) 
-                }
-            </div>
+            <div>
+                <div className='scene'>
+                    <div className={'cube ' + this.state.showClass}>
+                        { this.state.faces.map((face, id) => 
+                            {
+                                return (
+                                    <div key={id}>
+                                        <Face faceInfo={face}/>
+                                    </div>
+                                )
+                            }) 
+                        }
+                    </div>
+                    <div className='cube-buttons'>
+                    <button className='rotate-button' onClick={()=>this.rotateLeft()}>Rotate Anticlockwise</button>
+                    <button className='rotate-button' onClick={()=>this.rotateRight()}>Rotate Clockwise</button>
+                </div>
+                <div className='view-panel'>
+                    <div className='view-panel-header'>View</div> 
+                    <button className='view-button' onClick={() => this.selectView(0)}>FRONT</button>
+                    <button className='view-button' onClick={() => this.selectView(3)} >RIGHT</button>
+                    <button className='view-button' onClick={() => this.selectView(5)} >BACK</button>
+                    <button className='view-button' onClick={() => this.selectView(4)} >LEFT</button>
+                    <button className='view-button' onClick={() => this.selectView(1)} >TOP</button>
+                    <button className='view-button' onClick={() => this.selectView(2)} >BOTTOM</button>
+                </div>
+                </div>
+             
+          </div>
         );
     }
 }
