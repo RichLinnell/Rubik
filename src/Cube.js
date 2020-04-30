@@ -11,9 +11,9 @@ function Face(props)
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[0][2].colour}}/>
                 </div>
                 <div className='cube-row'>
+                    <div className='cube-square' style={{backgroundColor: props.faceInfo.data[1][0].colour}}/>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[1][1].colour}}/>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[1][2].colour}}/>
-                    <div className='cube-square' style={{backgroundColor: props.faceInfo.data[1][0].colour}}/>
                 </div>
                 <div className='cube-row'>
                     <div className='cube-square' style={{backgroundColor: props.faceInfo.data[2][0].colour}}/>
@@ -30,6 +30,13 @@ function Face(props)
 
 class Cube extends React.Component
 {
+    RED = 0;
+    YELLOW = 1;
+    WHITE = 2;
+    GREEN = 3;
+    BLUE = 4;
+    ORANGE = 5;
+    
     constructor(props){
         super(props);
         const faces = [
@@ -40,39 +47,55 @@ class Cube extends React.Component
             {name: 'Left', data: this.makeFace('blue')}, //4
             {name: 'Back', data: this.makeFace('orange')} //5
         ];
+
+        const row0 = [{row: 0, col: 2}, {row: 0, col: 1}, {row: 0, col: 0}];
+        const row2 = [{row: 2, col: 0}, {row: 2, col: 1}, {row: 2, col: 2}];
+        const col0 = [{row: 0, col: 0}, {row: 1, col: 0}, {row: 2, col: 0}];
+        const col2 = [{row: 2, col: 2}, {row: 1, col: 2}, {row: 0, col: 2}];
+
         // Bind faces
-        //Front
+        //Front (Red) : Top = Yellow, Left = Blue, Right = Green, Bottom = White
         //Top Row
-        faces[0].data[0][0].refA = {face: 4, row: 2, col: 2};
-        faces[0].data[0][0].refB = {face: 1, row: 2, col: 0};
-        faces[0].data[0][1].refA = {face: 1, row: 2, col: 1};
-        faces[0].data[0][2].refA = {face: 1, row: 2, col: 2};
-        faces[0].data[0][2].refB = {face: 3, row: 2, col: 0};
-        //Middle Row
-        faces[0].data[1][0].refA = {face: 4, row: 2, col: 1};
-        faces[0].data[1][2].refA = {face: 3, row: 2, col: 1};
-        //Bottom Row
-        faces[0].data[2][0].refA = {face: 2, row: 2, col: 2};
-        faces[0].data[2][0].refB = {face: 4, row: 2, col: 0};
-        faces[0].data[2][1].refA = {face: 2, row: 2, col: 1};
-        faces[0].data[2][2].refA = {face: 3, row: 2, col: 2};
-        faces[0].data[2][2].refB = {face: 2, row: 2, col: 0};
-        //Top
-        //Top Row - left's E, back's N, and Right's W
-        faces[1].data[0][0].refA = {face: 4, row: 0, col: 2};
-        faces[1].data[0][0].refB = {face: 5, row: 0, col: 2};
-        faces[1].data[0][1].refA = {face: 5, row: 0, col: 1};
-        faces[1].data[0][2].refA = {face: 5, row: 0, col: 0};
-        faces[1].data[0][2].refB = {face: 3, row: 2, col: 0};
-        //Middle Row
-        faces[1].data[1][0].refA = {face: 4, row: 1, col: 2};
-        faces[1].data[1][2].refA = {face: 3, row: 1, col: 0};
-        //Bottom Row
-        faces[1].data[2][0].refA = {face: 0, row: 0, col: 0};
-        faces[1].data[2][0].refB = {face: 4, row: 2, col: 2};
-        faces[1].data[2][1].refA = {face: 0, row: 0, col: 1};
-        faces[1].data[2][2].refA = {face: 3, row: 2, col: 0};
-        faces[1].data[2][2].refB = {face: 0, row: 0, col: 2};
+        let top = {face: this.YELLOW, cells: row2};
+        let left = {face: this.BLUE, cells: row2};
+        let right = {face: this.GREEN, cells: row2};
+        let bottom = {face: this.WHITE, cells: row2};
+        this.fillFaceAssociations(faces[this.RED], top, left, bottom, right);
+        
+        //Top (Yellow) : Top = Orange, Left = Blue, Right = Green, Bottom = Red
+        top = {face: this.ORANGE, cells: row2};
+        left = {face: this.BLUE, cells: col2};
+        right = {face: this.GREEN, cells: col0};
+        bottom = {face: this.RED, cells: row0};
+        this.fillFaceAssociations(faces[this.YELLOW], top, left, bottom, right);
+
+        //Bottom (White) : Top = Orange, Left = Green, Right = Blue, Bottom = Red
+        top = {face: this.ORANGE, cells: row0};
+        left = {face: this.GREEN, cells: col2};
+        right = {face: this.BLUE, cells: col0};
+        bottom = {face: this.RED, cells: row2};
+        this.fillFaceAssociations(faces[this.WHITE], top, left, bottom, right);
+
+        //Right (Green) : Top = Orange, Left = Yellow, Right = White, Bottom = Red
+        top = {face: this.ORANGE, cells: col2};
+        left = {face: this.YELLOW, cells: col2};
+        right = {face: this.WHITE, cells: col0};
+        bottom = {face: this.RED, cells: col2};
+        this.fillFaceAssociations(faces[this.GREEN], top, left, bottom, right);
+
+        //Left (Blue) : Top = Orange, Left = White, Right = Yellow, Bottom = Red
+        top = {face: this.ORANGE, cells: col0};
+        left = {face: this.WHITE, cells: col2};
+        right = {face: this.YELLOW, cells: col0};
+        bottom = {face: this.RED, cells: col0};
+        this.fillFaceAssociations(faces[this.BLUE], top, left, bottom, right);
+
+        //Back (Orange) : Top = White, Left = Blue, Right = Green, Bottom = Yellow
+        top = {face: this.WHITE, cells: row0};
+        left = {face: this.BLUE, cells: row0};
+        right = {face: this.GREEN, cells: row0};
+        bottom = {face: this.YELLOW, cells: row0};
+        this.fillFaceAssociations(faces[this.ORANGE], top, left, bottom, right);
 
         this.state = {
             faces : faces 
@@ -87,15 +110,39 @@ class Cube extends React.Component
         ]
     }
 
+    fillFaceAssociations(face, top, left, bottom, right){
+        face.data[0][0].refA = {face: left.face, ...left.cells[2]};
+        face.data[0][0].refB = {face: top.face, ...top.cells[0]};
+        face.data[0][1].refA = {face: top.face, ...top.cells[1]};
+        face.data[0][2].refA = {face: top.face, ...top.cells[2]};
+        face.data[0][2].refB = {face: right.face, ...right.cells[0]};
+        //Middle Row
+        face.data[1][0].refA = {face: left.face, ...left.cells[1]};
+        face.data[1][2].refA = {face: right.face, ...right.cells[1]};
+        //Bottom Row
+        face.data[2][0].refA = {face: bottom.face, ...bottom.cells[2]};
+        face.data[2][0].refB = {face: left.face, ...left.cells[0]};
+        face.data[2][1].refA = {face: bottom.face, ...bottom.cells[1]};
+        face.data[2][2].refA = {face: right.face, ...right.cells[2]};
+        face.data[2][2].refB = {face: bottom.face, ...bottom.cells[0]};
+    }
+
     cloneStateFaces(){
-        const newFaces = this.state.faces.slice();
+        const newFaces = [
+            {name: 'Front', data: this.makeFace('red')}, //0
+            {name: 'Top', data: this.makeFace('yellow')}, //1
+            {name: 'Bottom', data: this.makeFace('white')}, //2
+            {name: 'Right', data: this.makeFace('green')}, //3
+            {name: 'Left', data: this.makeFace('blue')}, //4
+            {name: 'Back', data: this.makeFace('orange')} //5
+        ];
         this.state.faces.forEach((item, index)=>{
-            newFaces[index]= {
-                name: item.name,
-                data: item.data.slice(),
-            };
             item.data.forEach((row, rowIndex) => {
-                newFaces[index].data[rowIndex] = row.slice();
+                row.forEach((col, colIndex) => {
+                    newFaces[index].data[rowIndex][colIndex].colour = col.colour;
+                    newFaces[index].data[rowIndex][colIndex].refA = {...col.refA};
+                    newFaces[index].data[rowIndex][colIndex].refB = col.refB ? {...col.refB} : null;
+                })
             });
         });
         return newFaces;
@@ -103,18 +150,19 @@ class Cube extends React.Component
 
     rotateRight(faceId){
         const newFaces = this.cloneStateFaces();
-        const ourFace = newFaces[faceId];
+        const existingFace = this.state.faces[faceId];
+        const newFace = newFaces[faceId];
      
-        this.pushCell(newFaces, ourFace.data[0][0], ourFace.data[0][2]);
-        this.pushCell(newFaces, ourFace.data[0][1], ourFace.data[1][2]);
-        this.pushCell(newFaces, ourFace.data[0][2], ourFace.data[2][2]);
+        this.pushCell(newFaces, existingFace.data[0][0], newFace.data[0][2]);
+        this.pushCell(newFaces, existingFace.data[0][1], newFace.data[1][2]);
+        this.pushCell(newFaces, existingFace.data[0][2], newFace.data[2][2]);
 
-        this.pushCell(newFaces, ourFace.data[1][0], ourFace.data[0][1]);
-        this.pushCell(newFaces, ourFace.data[1][2], ourFace.data[2][1]);
+        this.pushCell(newFaces, existingFace.data[1][0], newFace.data[0][1]);
+        this.pushCell(newFaces, existingFace.data[1][2], newFace.data[2][1]);
 
-        this.pushCell(newFaces, ourFace.data[2][0], ourFace.data[0][0]);
-        this.pushCell(newFaces, ourFace.data[2][1], ourFace.data[1][0]);
-        this.pushCell(newFaces, ourFace.data[2][2], ourFace.data[2][0]);
+        this.pushCell(newFaces, existingFace.data[2][0], newFace.data[0][0]);
+        this.pushCell(newFaces, existingFace.data[2][1], newFace.data[1][0]);
+        this.pushCell(newFaces, existingFace.data[2][2], newFace.data[2][0]);
         this.setState({faces: newFaces});
     }
 
@@ -123,9 +171,9 @@ class Cube extends React.Component
         const sourceRefB = source.refB;
         const targetRefA = target.refA;
         const targetRefB = target.refB;
-        if (targetRefA.row === 1 && targetRefA.col === 2) {
-            debugger;
-        }
+        
+        target.colour = source.colour;
+
         const sourceCellA = this.state.faces[sourceRefA.face].data[sourceRefA.row][sourceRefA.col];
         newFaces[targetRefA.face].data[targetRefA.row][targetRefA.col].colour = sourceCellA.colour;
         if(sourceRefB) {
