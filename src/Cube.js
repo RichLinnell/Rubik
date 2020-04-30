@@ -166,6 +166,24 @@ class Cube extends React.Component
         this.setState({faces: newFaces});
     }
 
+    rotateLeft(faceId){
+        const newFaces = this.cloneStateFaces();
+        const existingFace = this.state.faces[faceId];
+        const newFace = newFaces[faceId];
+     
+        this.pushCell(newFaces, existingFace.data[0][0], newFace.data[2][0]);
+        this.pushCell(newFaces, existingFace.data[0][1], newFace.data[1][0]);
+        this.pushCell(newFaces, existingFace.data[0][2], newFace.data[0][0]);
+
+        this.pushCell(newFaces, existingFace.data[1][0], newFace.data[2][1]);
+        this.pushCell(newFaces, existingFace.data[1][2], newFace.data[0][1]);
+
+        this.pushCell(newFaces, existingFace.data[2][0], newFace.data[2][2]);
+        this.pushCell(newFaces, existingFace.data[2][1], newFace.data[1][2]);
+        this.pushCell(newFaces, existingFace.data[2][2], newFace.data[0][2]);
+        this.setState({faces: newFaces});
+    }
+
     pushCell(newFaces, source, target){
         const sourceRefA = source.refA;
         const sourceRefB = source.refB;
@@ -189,7 +207,7 @@ class Cube extends React.Component
                     {
                         return (
                             <div key={id}>
-                                <Face faceInfo={face} rotateRight={() => this.rotateRight(id) } rotateLeft={() => alert('Anticlock') }/>
+                                <Face faceInfo={face} rotateRight={() => this.rotateRight(id) } rotateLeft={() => this.rotateLeft(id) }/>
                             </div>
                         )
                     }) 
