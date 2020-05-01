@@ -1,3 +1,9 @@
+# Rubik's Cube Simulator
+
+This is a very simple Rubik's cube simulator I put together when messing about with React.  It's not got tests, and is not particularly well architected - I was more interested in getting the logiic model for the cube, and rotation working than anything else.
+
+---
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
